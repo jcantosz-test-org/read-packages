@@ -1,0 +1,30 @@
+name: Gather details
+
+on:
+  workflow_dispatch:
+permissions:
+  actions: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      ORG: jcantosz-test-org
+      GITHUB_TOKEN: ${{ secrets.PAT }}
+    steps:
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
+        run: |
+          bytes_to_mb=1048576
+          echo "Getting list of all repos for org \"${ORG}\""
+          # I dont pipe, the command hangs (tries to open in editor?)
+          for repo in $(gh api orgs/${ORG}/repos --paginate --jq '.[].full_name'); do
+            # Get the size of non-expired artifacts for the repo. Final jq call for adding paginated results if needed
+            SIZE=$(gh api repos/${repo}/actions/artifacts --paginate --jq '[.artifacts[] | select(.expired == false) | .size_in_bytes] | add' | grep -v 'Not Found' | jq -s '. | add' | grep -v 'null')
+            if [ -n "${SIZE}" ]; then
+              # Don't display items with 0 bytes size
+                # Scale the size to MB from bytes
+                MB_SIZE=$(echo "scale=2; $SIZE / $bytes_to_mb" | bc)
+                echo "${repo}: ${MB_SIZE} MB"
+            fi
+          done
