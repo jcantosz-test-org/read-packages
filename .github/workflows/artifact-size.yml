@@ -1,4 +1,4 @@
-name: Gather details
+name: Gather Artifact Sizes
 
 on:
   workflow_dispatch:
@@ -26,6 +26,6 @@ jobs:
               # Don't display items with 0 bytes size
                 # Scale the size to MB from bytes
                 MB_SIZE=$(echo "scale=2; $SIZE / $bytes_to_mb" | bc)
-                echo "${repo}: ${MB_SIZE} MB (${SIZE} Bytes)"
+                echo "${repo}: ${MB_SIZE} MB (${SIZE} Bytes)" | tee -a $GITHUB_STEP_SUMMARY
             fi
           done
