@@ -2,14 +2,13 @@ name: Gather Artifact Sizes
 
 on:
   workflow_dispatch:
-permissions:
-  actions: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      ORG: jcantosz-test-org
+      # Use the current org
+      ORG: ${{ github.repository_owner }}
       GITHUB_TOKEN: ${{ secrets.PAT }}
     steps:
       # Runs a set of commands using the runners shell
