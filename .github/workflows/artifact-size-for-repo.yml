@@ -1,4 +1,5 @@
 name: Gather Artifact Size for a Repo
+run-name: Artifact sizes for ${{ github.repository_owner }}/${{ inputs.repository }}
 
 on:
   workflow_dispatch:
