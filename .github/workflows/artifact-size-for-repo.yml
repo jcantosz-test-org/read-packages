@@ -1,0 +1,31 @@
+name: Gather Artifact Size for a Repo
+
+on:
+  workflow_dispatch:
+    inputs:
+      repository:
+        description: The repository in the current org to get a list of packages for
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      # Use the current org
+      ORG: ${{ github.repository_owner }}
+      GITHUB_TOKEN: ${{ secrets.PAT }}
+      REPO: ${{ inputs.repository }}
+    steps:
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
+        run: |
+          set +e
+          echo "Getting list of artifacts for the repo \"${REPO}\" for org \"${ORG}\""
+
+          export slug="${ORG}/${REPO}"
+          export url_format="https://github.com/${slug}/actions/runs/"
+          
+          # Get the non-expired artifacts for the repo
+          size=$(gh api repos/${slug}/actions/artifacts --paginate --jq '.artifacts[] | select(.expired == false)  |  "artifact=\(.name), url='${url_format}'\(.workflow_run.id), size=\(.size_in_bytes) bytes"' | grep -v "Not Found")
+          echo "${size}" | tee -a $GITHUB_STEP_SUMMARY
