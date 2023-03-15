@@ -28,6 +28,8 @@ jobs:
           
           # Get the non-expired artifacts for the repo
           artifacts=$(gh api repos/${slug}/actions/artifacts --paginate --jq '.artifacts[] | select(.expired == false)  | .id' | grep -v "Not Found")
+          echo "artifacts ${artifacts}"
           for artifact in artifacts; do
+            echo "artifact ${artifact}"
             gh api -X DELETE /repos/${slug}/actions/artifacts/${artifact}
           done
