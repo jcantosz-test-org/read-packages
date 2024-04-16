@@ -1,0 +1,36 @@
+
+name: Delete Artifacts for a Repo (Win)
+run-name: Delete artifacts for ${{ github.repository_owner }}/${{ inputs.repository }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      repository:
+        description: The repository in the current org to delete artifacts for
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      # Use the current org
+      ORG: ${{ github.repository_owner }}
+      GITHUB_TOKEN: ${{ secrets.PAT }}
+      REPO: ${{ inputs.repository }}
+    steps:
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
+        run: |
+          set +e
+          echo "Getting list of artifacts for the repo '$env:REPO' for org '$env:ORG'"
+          $slug = "${env:ORG}/${env:REPO}"
+          
+          # Get the non-expired artifacts for the repo
+          $artifacts = gh api repos/${slug}/actions/artifacts --paginate --jq '.artifacts[] | select(.expired == false)  | .id'
+          if( $artifacts.length ){
+            foreach( $artifact in $artifacts ){
+              "artifact ${artifact}"
+              gh api -X DELETE /repos/${slug}/actions/artifacts/${artifact}
+            }
+          }
