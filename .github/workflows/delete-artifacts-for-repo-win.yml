@@ -22,8 +22,7 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
         run: |
-          set +e
-          echo "Getting list of artifacts for the repo '$env:REPO' for org '$env:ORG'"
+          "Getting list of artifacts for the repo '$env:REPO' for org '$env:ORG'"
           $slug = "${env:ORG}/${env:REPO}"
           
           # Get the non-expired artifacts for the repo
