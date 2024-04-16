@@ -14,6 +14,9 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Get each artifact size for each repo
         run: |
+
+          "| Repo | Size |" > $env:GITHUB_STEP_SUMMARY
+          "| ---- | ---- |" >> $env:GITHUB_STEP_SUMMARY
           echo "Getting list of all repos for org '$env:ORG'"
           $repos = gh api orgs/$env:ORG/repos --paginate --jq '.[].full_name'
           foreach( $repo in $repos ){
@@ -26,6 +29,6 @@ jobs:
             }
             if( $total_bytes ){
               $mb_size = [math]::Round( $total_bytes/1MB, 2 )
-              "${repo}: $mb_size MB ($total_bytes Bytes)" | tee -a $env:GITHUB_STEP_SUMMARY
+              "| $repo | $mb_size MB ($total_bytes Bytes) |" | tee -a $env:GITHUB_STEP_SUMMARY
             }
           }
