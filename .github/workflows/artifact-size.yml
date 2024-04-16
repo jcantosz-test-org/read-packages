@@ -15,6 +15,9 @@ jobs:
       - name: Run a multi-line script
         run: |
           set +e
+          
+          echo "| Repo | Size |" > $GITHUB_STEP_SUMMARY
+          echo "| ---- | ---- |" >> $GITHUB_STEP_SUMMARY
           bytes_to_mb=1048576
           echo "Getting list of all repos for org \"${ORG}\""
           # I dont pipe, the command hangs (tries to open in editor?)
@@ -25,6 +28,6 @@ jobs:
               # Don't display items with 0 bytes size
                 # Scale the size to MB from bytes
                 MB_SIZE=$(echo "scale=2; $SIZE / $bytes_to_mb" | bc)
-                echo "${repo}: ${MB_SIZE} MB (${SIZE} Bytes)" | tee -a $GITHUB_STEP_SUMMARY
+                echo "| ${repo} | ${MB_SIZE} MB (${SIZE} Bytes) |" | tee -a $GITHUB_STEP_SUMMARY
             fi
           done
