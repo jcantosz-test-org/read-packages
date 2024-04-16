@@ -1,0 +1,31 @@
+name: Gather Artifact Sizes
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      # Use the current org
+      ORG: ${{ github.repository_owner }}
+      GITHUB_TOKEN: ${{ secrets.PAT }}
+    steps:
+      # Runs a set of commands using the runners shell
+      - name: Get each artifact size for each repo
+        run: |
+          echo "Getting list of all repos for org '$env:ORG'"
+          $repos = gh api orgs/$env:ORG/repos --paginate --jq '.[].full_name'
+          foreach( $repo in $repos ){
+            $repo_artifact_data = gh api repos/${repo}/actions/artifacts --paginate --jq '.artifacts[] | select(.expired == false)' | convertFrom-Json
+            $total_bytes = 0
+            if( $repo_artifact_data.length ){
+              foreach( $data in $repo_artifact_data ){
+                $total_bytes += $data.size_in_bytes
+              }
+            }
+            if( $total_bytes ){
+              $mb_size = [math]::Round( $total_bytes/1MB, 2 )
+              "$repo: $mb_size MB ($total_bytes Bytes)" | tee -a $env:GITHUB_STEP_SUMMARY
+            }
+          }
