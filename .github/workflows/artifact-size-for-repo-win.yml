@@ -31,6 +31,7 @@ jobs:
           $artifacts = gh api repos/${slug}/actions/artifacts --paginate --jq '.artifacts[] | select(.expired == false)' | convertFrom-Json
           if( $artifacts.length ){
             foreach( $artifact in $artifacts ){
-              "| $artifact.name | $artifact.size bytes | $artifact.url |"
+              $name, $size, $url = $artifact.name, $artifact.size_in_bytes, $artifact.url 
+              "| $name | $size bytes | $url |" | tee -a $env:GITHUB_STEP_SUMMARY
             }
           }
