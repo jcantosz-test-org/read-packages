@@ -1,4 +1,4 @@
-name: Gather Artifact Sizes
+name: Gather Artifact Sizes (Win)
 
 on:
   workflow_dispatch:
