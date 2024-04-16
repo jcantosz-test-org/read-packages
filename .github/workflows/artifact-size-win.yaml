@@ -26,6 +26,6 @@ jobs:
             }
             if( $total_bytes ){
               $mb_size = [math]::Round( $total_bytes/1MB, 2 )
-              "$repo: $mb_size MB ($total_bytes Bytes)" | tee -a $env:GITHUB_STEP_SUMMARY
+              "${repo}: $mb_size MB ($total_bytes Bytes)" | tee -a $env:GITHUB_STEP_SUMMARY
             }
           }
